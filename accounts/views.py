@@ -6,26 +6,29 @@ from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework_simplejwt.authentication import JWTAuthentication
 from rest_framework_simplejwt.tokens import RefreshToken
 from django.contrib.auth import get_user_model, authenticate
+from .serializers import LoginSerializer
 
 # Create your views here.
 
-class register(APIView):
+class Register(APIView):
     permission_classes = [AllowAny]
 
     def post(self, request):
         User = get_user_model()
+        serializer = LoginSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
 
-        if User.objects.filter(username=request.data.get("username")).exists():
+
+        if User.objects.filter(username=serializer.validated_data.get("username")).exists():
             return Response(
                 {
-                    "error": "Username already exists"
+                    "detail": "Username already exists"
                 },
                 #conflict with system data ocde
                 status=status.HTTP_409_CONFLICT
             )
 
-        User.objects.create_user(username=request.data.get("username"), password=request.data.get("password"))
-        user = User.objects.get(username=request.data.get("username"))
+        user = User.objects.create_user(username=serializer.validated_data.get("username"), password=serializer.validated_data.get("password"))
 
         refresh = RefreshToken.for_user(user)
 
@@ -38,16 +41,18 @@ class register(APIView):
             status=201
         )
         
-class login(APIView):
+class Login(APIView):
     permission_classes = [AllowAny]
 
     def post(self, request):
-        user = authenticate(username=request.data.get("username"), password=request.data.get("password"))
+        serializer = LoginSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        user = authenticate(username=serializer.validated_data.get("username"), password=serializer.validated_data.get("password"))
         
         if not user:
             return Response(
                 {
-                    'error': "Username or password incorrect"
+                    'detail': "Username or password incorrect"
                 },
                 #not authorized to login code
                 status=status.HTTP_401_UNAUTHORIZED
@@ -65,14 +70,29 @@ class login(APIView):
         )
     
 
-class logout(APIView):
+class Logout(APIView):
     permission_classes = [IsAuthenticated]
 
     def post(self, request):
         refresh_token = request.data.get("refresh")
+
+        if not refresh_token:
+            return Response(
+                {
+                    'detail': "Refresh token not attached"
+                },
+                status=status.HTTP_400_BAD_REQUEST
+            )
         #turns token into object
-        refresh_token = RefreshToken(refresh_token)
-        refresh_token.blacklist()
+        try:
+            refresh_token = RefreshToken(refresh_token)
+            refresh_token.blacklist()
+        except:
+            return Response(
+            {
+                'detail': "Refresh token expired or invalid"
+            },
+            status=status.HTTP_400_BAD_REQUEST)
 
         #success code
         return Response(status=200)

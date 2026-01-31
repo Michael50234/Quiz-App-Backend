@@ -46,6 +46,8 @@ INSTALLED_APPS = [
     #rest framework and jwt
     "rest_framework",
     "rest_framework_simplejwt.token_blacklist",
+    "accounts",
+    "quizzes"
 
 ]
 
