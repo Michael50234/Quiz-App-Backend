@@ -25,9 +25,11 @@ class Choice(models.Model):
 
 
 class Submission(models.Model):
+    quiz = models.ForeignKey(Quiz, on_delete=models.CASCADE, related_name="submissions")
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="submissions")
-    submission_time = models.DateField()
-    score = models.IntegerField(blank=True)
+    submission_time = models.DateField(auto_now_add=True)
+    score = models.IntegerField()
+    number_of_questions = models.IntegerField()
 
 
 
