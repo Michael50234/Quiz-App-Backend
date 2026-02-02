@@ -56,16 +56,18 @@ class QuizSerializer(serializers.ModelSerializer):
             'questions'
         ]
 
-
 class SubmissionSerializer(serializers.ModelSerializer):
     user = UserSerializer(source="user")
+    quiz_title = serializers.CharField(source="quiz.title")
 
     class Meta:
         model = Submission
         fields = [
+            'quiz_title',
             'user',
             'submission_time',
-            'score'
+            'score',
+            'number_of_questions'
         ]
 
 
@@ -100,5 +102,6 @@ class CheckChoiceSerializer(serializers.Serializer):
     choice = serializers.CharField(max_length=1000)
 
 class CreateSubmissionSerializer(serializers.Serializer):
+    quiz_id = serializers.IntegerField()
     score = serializers.CharField(max_length=10)
     number_of_questions = serializers.IntegerField()
