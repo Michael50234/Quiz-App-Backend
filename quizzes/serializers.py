@@ -71,7 +71,7 @@ class SubmissionSerializer(serializers.ModelSerializer):
         ]
 
 
-#used to return all existing tags
+#Used to return all existing tags
 class TagSerializer(serializers.ModelSerializer):
     class Meta:
         model=Tag
@@ -80,7 +80,7 @@ class TagSerializer(serializers.ModelSerializer):
             'id'
         ]
 
-#creation serializers
+#Creation serializers
 class CreateChoiceSerializer(serializers.Serializer):
     choice = serializers.CharField(max_length=400)
     is_answer = serializers.BooleanField()
@@ -89,8 +89,6 @@ class CreateQuestionSerializer(serializers.Serializer):
     choices = CreateChoiceSerializer(many=True)
     question = serializers.CharField(max_length=400)
 
-#owner will come from request.user
-#tag_ids will be inputted as an array of tag ids
 class CreateQuizSerializer(serializers.Serializer):
     title = serializers.CharField(max_length=100, default="Untitled")
     tag_ids = serializers.ListField(child=serializers.IntegerField())
@@ -105,3 +103,20 @@ class CreateSubmissionSerializer(serializers.Serializer):
     quiz_id = serializers.IntegerField()
     score = serializers.CharField(max_length=10)
     number_of_questions = serializers.IntegerField()
+
+#Editing serializers
+class EditChoiceSerializer(serializers.Serializer):
+    id = serializers.IntegerField(required=False)
+    choice = serializers.CharField()
+    is_answer = serializers.BooleanField()
+
+class EditQuestionSerializer(serializers.Serializer):
+    id = serializers.IntegerField(required=False)
+    question = serializers.CharField()
+    choices = EditChoiceSerializer(many=True)
+
+class EditQuizSerializer(serializers.Serializer):
+    title = serializers.CharField()
+    is_public = serializers.BooleanField()
+    tag_ids = serializers.ListField(child=serializers.IntegerField())
+    questions = EditQuestionSerializer(many=True)
