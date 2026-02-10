@@ -6,7 +6,7 @@ from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework_simplejwt.authentication import JWTAuthentication
 from rest_framework_simplejwt.tokens import RefreshToken
 from django.contrib.auth import get_user_model, authenticate
-from .serializers import LoginSerializer
+from .serializers import LoginSerializer, SetNicknameSerializer
 
 # Create your views here.
 
@@ -68,7 +68,21 @@ class Login(APIView):
             #success code
             status=200
         )
-    
+
+class SetName(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        serializer = SetNicknameSerializer(request.data)
+        serializer.is_valid(raise_exception=True)
+        request.user.nickname = serializer.validated_data["nickname"]
+
+        return Response(
+            {
+                'detail': "Nickname successfully changed"
+            },
+            status=200
+        )
 
 class Logout(APIView):
     permission_classes = [IsAuthenticated]

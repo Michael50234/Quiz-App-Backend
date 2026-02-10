@@ -14,3 +14,6 @@ class UserSerializer(serializers.ModelSerializer):
             'id',
             'nickname'
         ]
+
+class SetNicknameSerializer(serializers.Serializer):
+    nickname = serializers.charField(max_length=50)

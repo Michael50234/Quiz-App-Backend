@@ -6,7 +6,7 @@ from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework_simplejwt.authentication import JWTAuthentication
 from django.contrib.auth import get_user_model
 from .models import Quiz, Tag, Question, Choice, Submission
-from .serializers import QuizSerializer, CreateQuizSerializer, TagSerializer, CheckChoiceSerializer, SubmissionSerializer, CreateSubmissionSerializer, EditQuizSerializer
+from .serializers import QuizSerializer, CreateQuizSerializer, TagSerializer, CheckChoiceSerializer, SubmissionSerializer, CreateSubmissionSerializer, EditQuizSerializer, QuizDisplaySerializer
 from .permissions import IsPublicOrOwner, IsOwner
 from django.db.models import Q
 from django.db import transaction
@@ -23,7 +23,7 @@ class UserQuizzes(APIView):
     def get(self, request):
         quizzes = request.user.quizzes.all()
 
-        serializer = QuizSerializer(instance=quizzes, many=True)
+        serializer = QuizDisplaySerializer(instance=quizzes, many=True)
 
         return Response(
             {
@@ -39,7 +39,7 @@ class PublicQuizzes(APIView):
     def get(self, request):
         quizzes = Quiz.objects.filter(Q(owner=request.user) | Q(is_public=True)).distinct()
 
-        serializer = QuizSerializer(instance=quizzes, many=True)
+        serializer = QuizDisplaySerializer(instance=quizzes, many=True)
 
         return Response(
             {
