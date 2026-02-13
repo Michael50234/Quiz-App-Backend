@@ -16,4 +16,4 @@ class UserSerializer(serializers.ModelSerializer):
         ]
 
 class SetNicknameSerializer(serializers.Serializer):
-    nickname = serializers.charField(max_length=50)
+    nickname = serializers.CharField(max_length=50)
