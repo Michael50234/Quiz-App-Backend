@@ -7,6 +7,7 @@ from rest_framework_simplejwt.authentication import JWTAuthentication
 from rest_framework_simplejwt.tokens import RefreshToken
 from django.contrib.auth import get_user_model, authenticate
 from .serializers import LoginSerializer, SetNicknameSerializer
+from firebase_admin import auth as firebase_auth
 
 # Create your views here.
 
@@ -69,7 +70,7 @@ class Login(APIView):
             status=200
         )
 
-class SetName(APIView):
+class Nickname(APIView):
     permission_classes = [IsAuthenticated]
 
     def post(self, request):
@@ -110,3 +111,18 @@ class Logout(APIView):
 
         #success code
         return Response(status=200)
+    
+class FirebaseLogin(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        user = request.user
+
+        firebase_token = firebase_auth.create_custom_token(str(user.id))
+
+        return Response(
+            {
+                "firebase_token": firebase_token.decode("utf-8")
+            },
+            status=200
+        )
