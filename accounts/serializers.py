@@ -7,13 +7,25 @@ class LoginSerializer(serializers.Serializer):
     username = serializers.CharField()
     password = serializers.CharField()
 
+#Adjust this in the quiz serializers
+class QuizUserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = [
+            'id',
+            'nickname',
+        ]
+
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = [
             'id',
-            'nickname'
+            'nickname',
+            'profile_picture_url',
+            'about_me'
         ]
 
-class SetNicknameSerializer(serializers.Serializer):
+class UpdateUserSerializer(serializers.Serializer):
     nickname = serializers.CharField(max_length=50)
+    profile_picture_url = serializers.CharField(max_length=1000)

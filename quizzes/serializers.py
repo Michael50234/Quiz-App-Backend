@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from .models import Choice, Quiz, Question, Tag, Submission
-from accounts.serializers import UserSerializer
+from accounts.serializers import QuizUserSerializer
 
 #quiz display serializers
 class TagDisplaySerializer(serializers.ModelSerializer):
@@ -12,15 +12,17 @@ class TagDisplaySerializer(serializers.ModelSerializer):
 
 class QuizDisplaySerializer(serializers.ModelSerializer):
     tags = TagDisplaySerializer(source='tags', many=True)
-    owner = UserSerializer(source='owner')
+    owner = QuizUserSerializer(source='owner')
 
     class Meta:
         model=Quiz
         fields = [
             'id'
             'title',
-            'owners',
-            'tags'
+            'owner',
+            'tags',
+            'cover_image_url',
+            'description'
         ]
 
 #quiz play serializers
@@ -39,12 +41,13 @@ class QuestionSerializer(serializers.ModelSerializer):
         model = Question
         fields = [
             'question',
-            'choices'
+            'choices',
+            'question_image_url',
         ]
 
 class QuizSerializer(serializers.ModelSerializer):
     tags = TagDisplaySerializer(source="tags", many=True)
-    owner = UserSerializer(source="owner")
+    owner = QuizUserSerializer(source="owner")
     questions = QuestionSerializer(source="questions", many=True)
 
     class Meta:
@@ -58,7 +61,7 @@ class QuizSerializer(serializers.ModelSerializer):
         ]
 
 class SubmissionSerializer(serializers.ModelSerializer):
-    user = UserSerializer(source="user")
+    user = QuizUserSerializer(source="user")
     quiz_title = serializers.CharField(source="quiz.title")
 
     class Meta:
@@ -89,12 +92,15 @@ class CreateChoiceSerializer(serializers.Serializer):
 class CreateQuestionSerializer(serializers.Serializer):
     choices = CreateChoiceSerializer(many=True)
     question = serializers.CharField(max_length=400)
+    question_image_url = serializers.CharField(max_length=1000, allow_null=True, default=None)
 
 class CreateQuizSerializer(serializers.Serializer):
     title = serializers.CharField(max_length=100, default="Untitled")
     tag_ids = serializers.ListField(child=serializers.IntegerField())
     questions = CreateQuestionSerializer(many=True)
-    is_public = serializers.BooleanField()
+    is_public = serializers.BooleanField(default=False)
+    cover_image_url = serializers.CharField(max_length=1000, default=None, allow_null=True)
+    description = serializers.CharField(max_length=3000, default="")
 
 class CheckChoiceSerializer(serializers.Serializer):
     id = serializers.IntegerField()
@@ -121,3 +127,5 @@ class EditQuizSerializer(serializers.Serializer):
     is_public = serializers.BooleanField()
     tag_ids = serializers.ListField(child=serializers.IntegerField())
     questions = EditQuestionSerializer(many=True)
+    cover_img_url = serializers.CharField(max_length=1000, default=None, allow_none=True)
+    description = serializers.CharField(max_length=3000, default="")

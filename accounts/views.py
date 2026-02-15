@@ -6,7 +6,7 @@ from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework_simplejwt.authentication import JWTAuthentication
 from rest_framework_simplejwt.tokens import RefreshToken
 from django.contrib.auth import get_user_model, authenticate
-from .serializers import LoginSerializer, SetNicknameSerializer
+from .serializers import LoginSerializer, UserSerializer, UpdateUserSerializer
 from firebase_admin import auth as firebase_auth
 
 # Create your views here.
@@ -70,17 +70,28 @@ class Login(APIView):
             status=200
         )
 
-class Nickname(APIView):
+
+class User(APIView):
     permission_classes = [IsAuthenticated]
 
+    def get(self, request):
+        serializer = UserSerializer(request.user)
+        return Response({
+            "data": serializer.data
+        },
+        status=200
+        )
+
+    #request body should contain link and nickname
     def post(self, request):
-        serializer = SetNicknameSerializer(request.data)
+        serializer = UpdateUserSerializer(request.data)
         serializer.is_valid(raise_exception=True)
         request.user.nickname = serializer.validated_data["nickname"]
+        request.user.profile_picture_url = serializer.validated_data["profile_picture_url"]
 
         return Response(
             {
-                'detail': "Nickname successfully changed"
+                'detail': "User data successfully changed"
             },
             status=200
         )
