@@ -121,6 +121,7 @@ class EditQuestionSerializer(serializers.Serializer):
     id = serializers.IntegerField(required=False)
     question = serializers.CharField()
     choices = EditChoiceSerializer(many=True)
+    question_image_url = serializers.CharField(max_length=1000, allow_null=True, default=None)
 
 class EditQuizSerializer(serializers.Serializer):
     title = serializers.CharField()

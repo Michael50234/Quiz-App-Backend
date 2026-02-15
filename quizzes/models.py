@@ -11,7 +11,7 @@ class Quiz(models.Model):
     owner = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="quizzes")
     tags = models.ManyToManyField(Tag, related_name="tags")
     is_public = models.BooleanField(default=False)
-    cover_image_url = models.CharField(max_length=1000, null=True)
+    cover_image_url = models.CharField(max_length=1000, null=True, default=None)
     description = models.CharField(max_length=3000, blank=True)
 
 class Question(models.Model):

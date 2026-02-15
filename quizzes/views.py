@@ -81,6 +81,8 @@ class EditQuiz(APIView):
             #update quiz fields
             quiz.title = data["title"]
             quiz.is_public = data["is_public"]
+            quiz.cover_image_url = data["cover_image_url"]
+            quiz.description = data["description"]
             quiz.save()
 
             #sync tags
@@ -98,10 +100,11 @@ class EditQuiz(APIView):
                 if "id" in q_data:
                     question = Question.objects.get(id=q_data["id"], quiz=quiz)
                     question.question = q_data["question"]
+                    question.question_image_url = q_data["question_image_url"]
                     question.save()
                 #create new questions
                 else:
-                    question = Question.objects.create(question=q_data["question"], quiz=quiz)
+                    question = Question.objects.create(question=q_data["question"], quiz=quiz, question_image_url=q_data["question_image_url"])
             
                 #sync choices
                 existing_c_ids = set(question.choices.values_list("id", flat=True))
@@ -150,7 +153,7 @@ class CreateQuiz(APIView):
         serializer.is_valid(raise_exception=True)
 
         with transaction.atomic():
-            quiz = Quiz(title=serializer.validated_data.get('title'), owner=request.user, is_public=serializer.validated_data.get('is_public'))
+            quiz = Quiz(title=serializer.validated_data.get('title'), owner=request.user, is_public=serializer.validated_data.get('is_public'), cover_image_url=serializer.validated_data.get("cover_image_url"), description=serializer.validated_data.get("description"))
             quiz.save()
             
             for tag_id in serializer.validated_data.get('tag_ids'):
@@ -158,7 +161,7 @@ class CreateQuiz(APIView):
                 quiz.tags.add(tag)
             
             for question_object in serializer.validated_data.get('questions'):
-                question = Question(question=question_object['question'], quiz=quiz)
+                question = Question(question=question_object['question'], quiz=quiz, question_image_url=question_object["question_image_url"])
                 question.save()
 
                 for choice_object in question_object['choices']:
