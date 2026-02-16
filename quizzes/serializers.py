@@ -102,14 +102,15 @@ class CreateQuizSerializer(serializers.Serializer):
     cover_image_url = serializers.CharField(max_length=1000, default=None, allow_null=True)
     description = serializers.CharField(max_length=3000, default="")
 
-class CheckChoiceSerializer(serializers.Serializer):
-    id = serializers.IntegerField()
-    choice = serializers.CharField(max_length=1000)
-
 class CreateSubmissionSerializer(serializers.Serializer):
     quiz_id = serializers.IntegerField()
     score = serializers.CharField(max_length=10)
     number_of_questions = serializers.IntegerField()
+
+#Checking Serializers
+class CheckChoiceSerializer(serializers.Serializer):
+    id = serializers.IntegerField()
+    choice = serializers.CharField(max_length=1000)
 
 #Editing serializers
 class EditChoiceSerializer(serializers.Serializer):
@@ -128,5 +129,5 @@ class EditQuizSerializer(serializers.Serializer):
     is_public = serializers.BooleanField()
     tag_ids = serializers.ListField(child=serializers.IntegerField())
     questions = EditQuestionSerializer(many=True)
-    cover_img_url = serializers.CharField(max_length=1000, default=None, allow_none=True)
+    cover_img_url = serializers.CharField(max_length=1000, default=None, allow_null=True)
     description = serializers.CharField(max_length=3000, default="")
