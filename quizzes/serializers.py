@@ -90,6 +90,7 @@ class CreateChoiceSerializer(serializers.Serializer):
     is_answer = serializers.BooleanField()
 
 class CreateQuestionSerializer(serializers.Serializer):
+    uid = serializers.CharField(max_length=1000)
     choices = CreateChoiceSerializer(many=True)
     question = serializers.CharField(max_length=400)
     question_image_url = serializers.CharField(max_length=1000, allow_null=True, default=None)

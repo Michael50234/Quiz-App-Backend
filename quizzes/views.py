@@ -152,9 +152,14 @@ class CreateQuiz(APIView):
         serializer = CreateQuizSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
 
+        response = {}
+
         with transaction.atomic():
             quiz = Quiz(title=serializer.validated_data.get('title'), owner=request.user, is_public=serializer.validated_data.get('is_public'), cover_image_url=serializer.validated_data.get("cover_image_url"), description=serializer.validated_data.get("description"))
             quiz.save()
+
+            response["quiz_id"] = quiz.id
+            response["question_ids"] = {} 
             
             for tag_id in serializer.validated_data.get('tag_ids'):
                 tag = Tag.objects.get(id=tag_id)
@@ -164,14 +169,16 @@ class CreateQuiz(APIView):
                 question = Question(question=question_object['question'], quiz=quiz, question_image_url=question_object["question_image_url"])
                 question.save()
 
+                response["question_ids"][question_object["uid"]] = question_object.question_id
+
                 for choice_object in question_object['choices']:
                     choice = Choice(choice=choice_object['choice'], is_answer=choice_object['is_answer'], question=question)
                     choice.save()
         
+        response["detail"] = "Successuflly created quiz"
+
         return Response(
-            {
-                "detail": "Successuflly created quiz"
-            },
+            response,
             status=201
         )
 
