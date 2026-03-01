@@ -120,6 +120,7 @@ class EditChoiceSerializer(serializers.Serializer):
     is_answer = serializers.BooleanField()
 
 class EditQuestionSerializer(serializers.Serializer):
+    uid = serializers.CharField(max_length=1000)
     id = serializers.IntegerField(required=False)
     question = serializers.CharField()
     choices = EditChoiceSerializer(many=True)

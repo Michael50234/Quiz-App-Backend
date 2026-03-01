@@ -76,6 +76,7 @@ class EditQuiz(APIView):
 
         quiz = get_object_or_404(Quiz, id=quiz_id)
         self.check_object_permissions(request, quiz)
+        response = {"quiz_id": quiz_id, "question_ids": {}}
 
         with transaction.atomic():
             #update quiz fields
@@ -98,6 +99,7 @@ class EditQuiz(APIView):
             for q_data in data["questions"]:
                 #update existing questions
                 if "id" in q_data:
+                    response["question_ids"][q_data.uid] =  q_data["id"]
                     question = Question.objects.get(id=q_data["id"], quiz=quiz)
                     question.question = q_data["question"]
                     question.question_image_url = q_data["question_image_url"]
@@ -105,6 +107,7 @@ class EditQuiz(APIView):
                 #create new questions
                 else:
                     question = Question.objects.create(question=q_data["question"], quiz=quiz, question_image_url=q_data["question_image_url"])
+                    response["question_ids"][q_data.uid] = question.id
             
                 #sync choices
                 existing_c_ids = set(question.choices.values_list("id", flat=True))
@@ -122,10 +125,10 @@ class EditQuiz(APIView):
                     else:
                         Choice.objects.create(choice=c_data["choice"], is_answer=c_data["is_answer"], question=question)
         
+        response["detail"] = "Quiz updated successfully"
+
         return Response(
-            {
-                "detail": "Quiz updated successfully"
-            },
+            response,
             status=200
         )        
 
@@ -169,13 +172,13 @@ class CreateQuiz(APIView):
                 question = Question(question=question_object['question'], quiz=quiz, question_image_url=question_object["question_image_url"])
                 question.save()
 
-                response["question_ids"][question_object["uid"]] = question_object.question_id
+                response["question_ids"][question_object["uid"]] = question.id
 
                 for choice_object in question_object['choices']:
                     choice = Choice(choice=choice_object['choice'], is_answer=choice_object['is_answer'], question=question)
                     choice.save()
         
-        response["detail"] = "Successuflly created quiz"
+        response["detail"] = "Successfully created quiz"
 
         return Response(
             response,
