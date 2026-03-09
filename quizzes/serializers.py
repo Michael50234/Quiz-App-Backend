@@ -7,17 +7,17 @@ class TagDisplaySerializer(serializers.ModelSerializer):
     class Meta:
         model = Tag
         fields = [
-            'name'
+            'name',
         ]
 
 class QuizDisplaySerializer(serializers.ModelSerializer):
-    tags = TagDisplaySerializer(source='tags', many=True)
-    owner = QuizUserSerializer(source='owner')
+    tags = TagDisplaySerializer(many=True)
+    owner = QuizUserSerializer()
 
     class Meta:
         model=Quiz
         fields = [
-            'id'
+            'id',
             'title',
             'owner',
             'tags',
@@ -35,7 +35,7 @@ class ChoiceSerializer(serializers.ModelSerializer):
         ]
 
 class QuestionSerializer(serializers.ModelSerializer):
-    choices = ChoiceSerializer(source="choices", many=True)
+    choices = ChoiceSerializer(many=True)
 
     class Meta:
         model = Question
@@ -46,9 +46,9 @@ class QuestionSerializer(serializers.ModelSerializer):
         ]
 
 class QuizSerializer(serializers.ModelSerializer):
-    tags = TagDisplaySerializer(source="tags", many=True)
-    owner = QuizUserSerializer(source="owner")
-    questions = QuestionSerializer(source="questions", many=True)
+    tags = TagDisplaySerializer(many=True)
+    owner = QuizUserSerializer()
+    questions = QuestionSerializer(many=True)
 
     class Meta:
         model = Quiz
@@ -61,8 +61,7 @@ class QuizSerializer(serializers.ModelSerializer):
         ]
 
 class SubmissionSerializer(serializers.ModelSerializer):
-    user = QuizUserSerializer(source="user")
-    quiz_title = serializers.CharField(source="quiz.title")
+    user = QuizUserSerializer()
 
     class Meta:
         model = Submission
@@ -100,7 +99,7 @@ class CreateQuizSerializer(serializers.Serializer):
     tag_ids = serializers.ListField(child=serializers.IntegerField())
     questions = CreateQuestionSerializer(many=True)
     is_public = serializers.BooleanField(default=False)
-    cover_image_url = serializers.CharField(max_length=1000, default=None, allow_null=True)
+    cover_image_url = serializers.CharField(max_length=1000, default=None, allow_null=True, required=False)
     description = serializers.CharField(max_length=3000, default="")
 
 class CreateSubmissionSerializer(serializers.Serializer):
@@ -131,5 +130,5 @@ class EditQuizSerializer(serializers.Serializer):
     is_public = serializers.BooleanField()
     tag_ids = serializers.ListField(child=serializers.IntegerField())
     questions = EditQuestionSerializer(many=True)
-    cover_img_url = serializers.CharField(max_length=1000, default=None, allow_null=True)
+    cover_image_url = serializers.CharField(max_length=1000, default=None, allow_null=True, required=False)
     description = serializers.CharField(max_length=3000, default="")

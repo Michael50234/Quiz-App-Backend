@@ -70,7 +70,7 @@ class EditQuiz(APIView):
     permission_classes = [IsAuthenticated, IsOwner]
 
     def patch(self, request, quiz_id):
-        serializer = EditQuizSerializer(request.data)
+        serializer = EditQuizSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         data = serializer.validated_data
 
@@ -99,7 +99,7 @@ class EditQuiz(APIView):
             for q_data in data["questions"]:
                 #update existing questions
                 if "id" in q_data:
-                    response["question_ids"][q_data.uid] =  q_data["id"]
+                    response["question_ids"][q_data["uid"]] =  q_data["id"]
                     question = Question.objects.get(id=q_data["id"], quiz=quiz)
                     question.question = q_data["question"]
                     question.question_image_url = q_data["question_image_url"]
@@ -107,7 +107,7 @@ class EditQuiz(APIView):
                 #create new questions
                 else:
                     question = Question.objects.create(question=q_data["question"], quiz=quiz, question_image_url=q_data["question_image_url"])
-                    response["question_ids"][q_data.uid] = question.id
+                    response["question_ids"][q_data["uid"]] = question.id
             
                 #sync choices
                 existing_c_ids = set(question.choices.values_list("id", flat=True))
@@ -124,8 +124,6 @@ class EditQuiz(APIView):
                         choice.save()
                     else:
                         Choice.objects.create(choice=c_data["choice"], is_answer=c_data["is_answer"], question=question)
-        
-        response["detail"] = "Quiz updated successfully"
 
         return Response(
             response,
@@ -141,9 +139,6 @@ class DeleteQuiz(APIView):
         self.check_object_permissions(request, quiz)
         quiz.delete()
         return Response(
-            {
-                "details": "Successfully deleted quiz"
-            },
             status=204
         )
     
@@ -178,8 +173,6 @@ class CreateQuiz(APIView):
                     choice = Choice(choice=choice_object['choice'], is_answer=choice_object['is_answer'], question=question)
                     choice.save()
         
-        response["detail"] = "Successfully created quiz"
-
         return Response(
             response,
             status=201
@@ -229,9 +222,6 @@ class SubmissionView(APIView):
         Submission.objects.create(user=request.user, score=serializer.validated_data.get('score'), number_of_questions=serializer.validated_data.get("number_of_questions"), quiz=quiz)
 
         return Response(
-            {
-                "detail": "Successfully submitted"
-            },
             status=201
         )
     
