@@ -30,8 +30,8 @@ class ChoiceSerializer(serializers.ModelSerializer):
     class Meta:
         model = Choice
         fields = [
-            'id'
-            'choice'
+            'id',
+            'choice',
         ]
 
 class QuestionSerializer(serializers.ModelSerializer):
@@ -40,6 +40,7 @@ class QuestionSerializer(serializers.ModelSerializer):
     class Meta:
         model = Question
         fields = [
+            'id',
             'question',
             'choices',
             'question_image_url',
@@ -55,9 +56,12 @@ class QuizSerializer(serializers.ModelSerializer):
         fields = [
             'id',
             'title',
+            'is_public',
+            'cover_image_url',
+            'description',
             'tags',
             'owner',
-            'questions'
+            'questions',
         ]
 
 class SubmissionSerializer(serializers.ModelSerializer):
@@ -70,7 +74,7 @@ class SubmissionSerializer(serializers.ModelSerializer):
             'user',
             'submission_time',
             'score',
-            'number_of_questions'
+            'number_of_questions',
         ]
 
 

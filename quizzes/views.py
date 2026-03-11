@@ -59,9 +59,7 @@ class QuizView(APIView):
         serializer = QuizSerializer(instance=quiz)
 
         return Response(
-            {
-                'quiz': serializer.data
-            },
+            serializer.data,
             status=200
         )
 
@@ -187,7 +185,7 @@ class TagsView(APIView):
 
         return Response(
             {
-                'tags': serializer.data
+                "tags": serializer.data
             },
             status=200
         )
@@ -230,7 +228,7 @@ class SubmissionView(APIView):
         serializer = SubmissionSerializer(instance=request.user.submissions.all(), many=True)
         return Response(
             {
-            "submissions": serializer.data
+                "submissions": serializer.data
             },
             status=200
         )
