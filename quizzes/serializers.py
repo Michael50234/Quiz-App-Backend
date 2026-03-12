@@ -25,13 +25,14 @@ class QuizDisplaySerializer(serializers.ModelSerializer):
             'description'
         ]
 
-#quiz play serializers
+#Quiz Detail View Serializers
 class ChoiceSerializer(serializers.ModelSerializer):
     class Meta:
         model = Choice
         fields = [
             'id',
             'choice',
+            'is_answer'
         ]
 
 class QuestionSerializer(serializers.ModelSerializer):
@@ -77,6 +78,44 @@ class SubmissionSerializer(serializers.ModelSerializer):
             'number_of_questions',
         ]
 
+#Quiz Play Serializers
+class ChoicePlaySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Choice
+        fields = [
+            'id',
+            'choice'
+        ]
+
+class QuestionPlaySerializer(serializers.ModelSerializer):
+    choices = ChoicePlaySerializer(many=True)
+
+    class Meta: 
+        model = Question
+        fields = [
+            'id',
+            'question',
+            'choices',
+            'question_image_url',
+        ]
+
+class QuizPlaySerializer(serializers.ModelSerializer):
+    tags = TagDisplaySerializer(many=True)
+    owner = QuizUserSerializer()
+    questions = QuestionPlaySerializer(many=True)
+
+    class Meta:
+        model = Quiz
+        fields = [
+            'id',
+            'title',
+            'is_public',
+            'cover_image_url',
+            'description',
+            'tags',
+            'owner',
+            'questions',
+        ]
 
 #Used to return all existing tags
 class TagSerializer(serializers.ModelSerializer):

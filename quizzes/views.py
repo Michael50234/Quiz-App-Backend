@@ -6,7 +6,7 @@ from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework_simplejwt.authentication import JWTAuthentication
 from django.contrib.auth import get_user_model
 from .models import Quiz, Tag, Question, Choice, Submission
-from .serializers import QuizSerializer, CreateQuizSerializer, TagSerializer, CheckChoiceSerializer, SubmissionSerializer, CreateSubmissionSerializer, EditQuizSerializer, QuizDisplaySerializer
+from .serializers import QuizSerializer, CreateQuizSerializer, TagSerializer, CheckChoiceSerializer, SubmissionSerializer, CreateSubmissionSerializer, EditQuizSerializer, QuizDisplaySerializer, QuizPlaySerializer
 from .permissions import IsPublicOrOwner, IsOwner
 from django.db.models import Q
 from django.db import transaction
@@ -49,7 +49,7 @@ class PublicQuizzes(APIView):
         )
 
 #Used to get the information for a quiz
-class QuizView(APIView):
+class QuizDetailView(APIView):
     permission_classes = [IsAuthenticated, IsPublicOrOwner]
 
     #get quiz data
@@ -57,6 +57,20 @@ class QuizView(APIView):
         quiz = get_object_or_404(Quiz, id=quiz_id)
         self.check_object_permissions(request, quiz)
         serializer = QuizSerializer(instance=quiz)
+
+        return Response(
+            serializer.data,
+            status=200
+        )
+
+#Used to get information for playing a quiz (doesnt return answers)
+class QuizPlayView(APIView):
+    permission_classes = [IsAuthenticated, IsPublicOrOwner]
+
+    def get(self, request, quiz_id):
+        quiz = get_object_or_404(Quiz, id=quiz_id)
+        self.check_object_permissions(request, quiz)
+        serializer = QuizPlaySerializer(instance=quiz)
 
         return Response(
             serializer.data,
