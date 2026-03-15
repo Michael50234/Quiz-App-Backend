@@ -76,11 +76,7 @@ class User(APIView):
 
     def get(self, request):
         serializer = UserSerializer(request.user)
-        return Response({
-            "data": serializer.data
-        },
-        status=200
-        )
+        return Response(serializer.data, status=200)
 
     #request body should contain link and nickname
     def post(self, request):

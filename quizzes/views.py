@@ -23,6 +23,14 @@ class UserQuizzes(APIView):
     def get(self, request):
         quizzes = request.user.quizzes.all()
 
+        searchText = request.query_params.get("searchText")
+        tag_ids = request.query_params.getlist("tagId")
+
+        if(searchText):
+            quizzes = quizzes.filter(title__icontains=searchText)
+        if(tag_ids):
+            quizzes = quizzes.filter(tags__id__in=tag_ids)
+
         serializer = QuizDisplaySerializer(instance=quizzes, many=True)
 
         return Response(
@@ -38,6 +46,14 @@ class PublicQuizzes(APIView):
 
     def get(self, request):
         quizzes = Quiz.objects.filter(Q(owner=request.user) | Q(is_public=True)).distinct()
+
+        searchText = request.query_params.get("searchText")
+        tag_ids = request.query_params.getlist("tagId")
+
+        if(searchText):
+            quizzes = quizzes.filter(title__icontains=searchText)
+        if(tag_ids):
+            quizzes = quizzes.filter(tags__id__in=tag_ids)
 
         serializer = QuizDisplaySerializer(instance=quizzes, many=True)
 
