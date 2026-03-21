@@ -29,3 +29,4 @@ class UserSerializer(serializers.ModelSerializer):
 class UpdateUserSerializer(serializers.Serializer):
     nickname = serializers.CharField(max_length=50)
     profile_picture_url = serializers.CharField(max_length=1000)
+    about_me = serializers.CharField(max_length=3000)
