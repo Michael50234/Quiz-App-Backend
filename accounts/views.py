@@ -80,11 +80,12 @@ class User(APIView):
 
     #request body should contain link and nickname
     def post(self, request):
-        serializer = UpdateUserSerializer(request.data)
+        serializer = UpdateUserSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         request.user.nickname = serializer.validated_data["nickname"]
         request.user.profile_picture_url = serializer.validated_data["profile_picture_url"]
-        request.user.about_me = serializer.validated_data[""]
+        request.user.about_me = serializer.validated_data["about_me"]
+        request.user.save()
 
         return Response(
             {

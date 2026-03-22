@@ -14,6 +14,8 @@ class QuizUserSerializer(serializers.ModelSerializer):
         fields = [
             'id',
             'nickname',
+            'profile_picture_url',
+            'about_me'
         ]
 
 class UserSerializer(serializers.ModelSerializer):
@@ -27,6 +29,6 @@ class UserSerializer(serializers.ModelSerializer):
         ]
 
 class UpdateUserSerializer(serializers.Serializer):
-    nickname = serializers.CharField(max_length=50)
-    profile_picture_url = serializers.CharField(max_length=1000)
-    about_me = serializers.CharField(max_length=3000)
+    nickname = serializers.CharField(max_length=50, required=False, allow_blank=True)
+    profile_picture_url = serializers.CharField(max_length=1000, required=False, allow_blank=True)
+    about_me = serializers.CharField(max_length=3000, required=False, allow_blank=True)

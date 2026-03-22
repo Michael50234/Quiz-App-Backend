@@ -6,7 +6,7 @@ from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework_simplejwt.authentication import JWTAuthentication
 from django.contrib.auth import get_user_model
 from .models import Quiz, Tag, Question, Choice, Submission
-from .serializers import QuizSerializer, CreateQuizSerializer, TagSerializer, CheckChoiceSerializer, SubmissionSerializer, CreateSubmissionSerializer, EditQuizSerializer, QuizDisplaySerializer, QuizPlaySerializer
+from .serializers import QuizSerializer, CreateQuizSerializer, TagSerializer, CheckChoiceSerializer, SubmissionSerializer, CreateSubmissionSerializer, EditQuizSerializer, QuizDisplaySerializer, QuizPlaySerializer, ChoicePlaySerializer
 from .permissions import IsPublicOrOwner, IsOwner
 from django.db.models import Q
 from django.db import transaction
@@ -228,11 +228,28 @@ class CheckQuestion(APIView):
         serializer = CheckChoiceSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
 
-        is_answer = Choice.objects.get(id=choice_id).is_answer
+        choice = Choice.objects.get(id=choice_id)
+        is_answer = choice.is_answer
+        question = choice.question
+        correct_choice = None
+        for choice in question.choices:
+            if choice.is_answer:
+                correct_choice = choice
+        
+        if correct_choice:
+            correct_choice = ChoicePlaySerializer(instance=correct_choice).data
+        # return an error if no correct choice exists for the question
+        else:
+            return Response(
+                {
+                    "detail": "No correct choice found"
+                },
+                status=status.HTTP_400_BAD_REQUEST
+            )
 
         return Response(
             {
-                'choice': serializer.validated_data.get('choice'),
+                'correct_choice': serializer.validated_data.get('choice'),
                 'is_answer': is_answer
             },
             status=200

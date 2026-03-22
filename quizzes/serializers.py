@@ -26,6 +26,14 @@ class QuizDisplaySerializer(serializers.ModelSerializer):
         ]
 
 #Quiz Detail View Serializers
+class TagSerializer(serializers.ModelSerializer):
+    class Meta: 
+        model = Tag
+        fields = [
+            'id',
+            'name',
+        ]
+
 class ChoiceSerializer(serializers.ModelSerializer):
     class Meta:
         model = Choice
@@ -48,9 +56,9 @@ class QuestionSerializer(serializers.ModelSerializer):
         ]
 
 class QuizSerializer(serializers.ModelSerializer):
-    tags = TagDisplaySerializer(many=True)
     owner = QuizUserSerializer()
     questions = QuestionSerializer(many=True)
+    tags = TagSerializer(many=True)
 
     class Meta:
         model = Quiz
