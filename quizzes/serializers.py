@@ -108,7 +108,6 @@ class QuestionPlaySerializer(serializers.ModelSerializer):
         ]
 
 class QuizPlaySerializer(serializers.ModelSerializer):
-    tags = TagDisplaySerializer(many=True)
     owner = QuizUserSerializer()
     questions = QuestionPlaySerializer(many=True)
 
@@ -117,10 +116,7 @@ class QuizPlaySerializer(serializers.ModelSerializer):
         fields = [
             'id',
             'title',
-            'is_public',
             'cover_image_url',
-            'description',
-            'tags',
             'owner',
             'questions',
         ]
@@ -157,11 +153,6 @@ class CreateSubmissionSerializer(serializers.Serializer):
     quiz_id = serializers.IntegerField()
     score = serializers.CharField(max_length=10)
     number_of_questions = serializers.IntegerField()
-
-#Checking Serializers
-class CheckChoiceSerializer(serializers.Serializer):
-    id = serializers.IntegerField()
-    choice = serializers.CharField(max_length=1000)
 
 #Editing serializers
 class EditChoiceSerializer(serializers.Serializer):

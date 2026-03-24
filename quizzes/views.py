@@ -2,11 +2,11 @@ from django.shortcuts import render, get_object_or_404
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
-from rest_framework.permissions import IsAuthenticated, AllowAny
+from rest_framework.permissions import IsAuthenticated
 from rest_framework_simplejwt.authentication import JWTAuthentication
 from django.contrib.auth import get_user_model
 from .models import Quiz, Tag, Question, Choice, Submission
-from .serializers import QuizSerializer, CreateQuizSerializer, TagSerializer, CheckChoiceSerializer, SubmissionSerializer, CreateSubmissionSerializer, EditQuizSerializer, QuizDisplaySerializer, QuizPlaySerializer, ChoicePlaySerializer
+from .serializers import QuizSerializer, CreateQuizSerializer, TagSerializer, SubmissionSerializer, CreateSubmissionSerializer, EditQuizSerializer, QuizDisplaySerializer, QuizPlaySerializer, ChoicePlaySerializer
 from .permissions import IsPublicOrOwner, IsOwner
 from django.db.models import Q
 from django.db import transaction
@@ -224,21 +224,28 @@ class TagsView(APIView):
 class CheckQuestion(APIView):
     permission_classes = [IsAuthenticated]
 
-    def post(self, request, choice_id):
-        serializer = CheckChoiceSerializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-
+    def get(self, request, choice_id):
+        # Use the choice id to find the id of the correct choice for the question
         choice = Choice.objects.get(id=choice_id)
-        is_answer = choice.is_answer
         question = choice.question
-        correct_choice = None
-        for choice in question.choices:
+        question_choices = question.choices.all()
+
+        correct_choice_id = None
+
+        for choice in question_choices:
             if choice.is_answer:
-                correct_choice = choice
+                correct_choice_id = choice.id
         
-        if correct_choice:
-            correct_choice = ChoicePlaySerializer(instance=correct_choice).data
-        # return an error if no correct choice exists for the question
+        #Return the id of the correct choice if it exists
+        if correct_choice_id:
+            return Response(
+                {
+                    "correct_choice_id": correct_choice_id
+                },
+                status=200
+            )
+        
+        #Return an error if no correct choice exists for the question
         else:
             return Response(
                 {
@@ -246,15 +253,6 @@ class CheckQuestion(APIView):
                 },
                 status=status.HTTP_400_BAD_REQUEST
             )
-
-        return Response(
-            {
-                'correct_choice': serializer.validated_data.get('choice'),
-                'is_answer': is_answer
-            },
-            status=200
-        )
-
 
 class SubmissionView(APIView):
     permission_classes = [IsAuthenticated]
