@@ -75,10 +75,12 @@ class QuizSerializer(serializers.ModelSerializer):
 
 class SubmissionSerializer(serializers.ModelSerializer):
     user = QuizUserSerializer()
+    quiz_title = serializers.CharField(source="quiz.title")
 
     class Meta:
         model = Submission
         fields = [
+            'id',
             'quiz_title',
             'user',
             'submission_time',
