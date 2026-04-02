@@ -21,7 +21,7 @@ class UserQuizzes(APIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request):
-        quizzes = request.user.quizzes.all()
+        quizzes = request.user.quizzes.all().distinct()
 
         searchText = request.query_params.get("searchText")
         tag_ids = request.query_params.getlist("tagId")

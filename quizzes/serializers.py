@@ -149,7 +149,7 @@ class CreateQuizSerializer(serializers.Serializer):
     questions = CreateQuestionSerializer(many=True)
     is_public = serializers.BooleanField(default=False)
     cover_image_url = serializers.CharField(max_length=1000, default=None, allow_null=True, required=False)
-    description = serializers.CharField(max_length=3000, default="")
+    description = serializers.CharField(max_length=3000, allow_blank=True, default="")
 
 class CreateSubmissionSerializer(serializers.Serializer):
     quiz_id = serializers.IntegerField()
@@ -175,4 +175,4 @@ class EditQuizSerializer(serializers.Serializer):
     tag_ids = serializers.ListField(child=serializers.IntegerField())
     questions = EditQuestionSerializer(many=True)
     cover_image_url = serializers.CharField(max_length=1000, default=None, allow_null=True, required=False)
-    description = serializers.CharField(max_length=3000, default="")
+    description = serializers.CharField(max_length=3000, allow_blank=True, default="")
